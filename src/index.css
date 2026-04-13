@@ -1,0 +1,30 @@
+@import url("bootstrap/dist/css/bootstrap.css");
+
+@font-face {
+    font-family: "SF Pro Reguler";
+    src: url('./assets/fonts/SF-Pro-Text-Regular.otf') format("opentype");
+}
+
+body{
+    padding-bottom: 10dvw;
+    overflow-x: hidden;
+    padding-top: 4dvw;
+    font-family: "SF Pro Reguler";
+}
+.modalCamera {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    position: fixed !important;
+    z-index: 99;
+    font-family: "SF Pro Reguler";
+}
+.glassBox{
+    background-color: rgba(255, 255, 255, .16);
+    backdrop-filter: blur(2px);
+}
+.sf-text{
+    font-family: "sf-reguler";
+}
+
+/* //test */
