@@ -26,13 +26,15 @@ const FormPengumpulan = () => {
     const namaRef = useRef<HTMLInputElement>(null)
     const phoneRef = useRef<HTMLInputElement>(null)
     const namaGuruRef = useRef<HTMLInputElement>(null)
+    const notesRef = useRef<HTMLInputElement>(null)
     const namaGuruRef1 = useRef<HTMLSelectElement>(null)
     const namaGuruRef2 = useRef<HTMLSelectElement>(null)
+    const namaGuruRef3 = useRef<HTMLSelectElement>(null)
     const kelasRef = useRef<HTMLSelectElement>(null)
     const laporanRef = useRef<HTMLSelectElement>(null)
     const navigate = useNavigate()
 
-    const namGuruArr = [namaGuruRef, namaGuruRef1, namaGuruRef2]
+    const namGuruArr = [namaGuruRef, namaGuruRef1, namaGuruRef2, namaGuruRef3]
     const [dataTeacher, detDataTeacher] = useState<dataTeacher[]>()
     const [photoBlob, setPhotoBlob] = useState<Blob>()
     const [photoUrl, setPhoto] = useState<string | boolean>(false)
@@ -183,19 +185,19 @@ const FormPengumpulan = () => {
             const kelasValue = kelasRef.current.value
             const laporanValue: number = Number(laporanRef.current.value)
             const phoneValue = phoneRef.current.value
+            const notesValue = notesRef.current?.value ? notesRef.current.value : null
             if (progress == 100) {
-
                 if (namaValue && kelasValue && laporanValue && photoUrl) {
                     if (namGuruArr[laporanValue].current) {
                         const namaGuru = namGuruArr[laporanValue].current.value
-
                         const formData = new FormData
                         formData.append("officer", namaValue)
                         formData.append("class_id", kelasValue)
                         formData.append("image", photoBlob as Blob)
-                        formData.append("type", laporanValue == 1 ? "Pengumpulan" : "Pengambilan")
+                        formData.append("type", laporanValue == 1 ? "Pengumpulan" : laporanValue == 2 ? "Pengambilan" : "Peminjaman")
                         formData.append("teacher", namaGuru)
                         formData.append("phone", phoneValue)
+                        formData.append("notes", notesValue as string)
                         try {
                             axios.post("http://127.0.0.1:8000/api/report", formData,)
                                 .then(data => {
@@ -274,6 +276,7 @@ const FormPengumpulan = () => {
                         <option value="default" selected hidden>Pilih bentuk</option>
                         <option value={1}>Pengumpulan</option>
                         <option value={2}>Pengambilan</option>
+                        <option value={3}>Peminjaman</option>
                     </select>
                 </div>
                 {!isLaporan && (
@@ -316,6 +319,31 @@ const FormPengumpulan = () => {
                                 )
                             })}
                         </select>
+                    </div>
+                )}
+                {isLaporan == 3 && (
+                    <div className=" mb-2">
+                        <label htmlFor="namaGuru3" className=" form-label fw-semibold text-primary">
+                            <i className="bi bi-person-video3 me-2"></i>
+                            <span>Nama Guru Penanggung-Jawab</span>
+                        </label>
+                        <select name="namaGuru3" id="namaGuru3" ref={namaGuruRef3} className="form-select">
+                            <option value="default" selected hidden>Pilih Guru</option>
+                            {dataTeacher?.map((a) => {
+                                return (
+                                    <option value={a.id} className=" text-capitalize">{a.name}</option>
+                                )
+                            })}
+                        </select>
+                    </div>
+                )}
+                {isLaporan == 3 && (
+                    <div className=" mb-2">
+                        <label htmlFor="namaGuru3" className=" form-label fw-semibold text-primary">
+                            <i className="bi bi-person-video3 me-2"></i>
+                            <span>Catatan Peminjaman</span>
+                        </label>
+                        <input type="text" name="" id="" className=" form-control" ref={notesRef} />
                     </div>
                 )}
                 <div className=" mb-2">
@@ -383,15 +411,19 @@ const FormPengumpulan = () => {
                 <hr />
                 <p className=" text-secondary">Pindah ke halaman</p>
                 <div className=" d-flex gap-2">
-                    <Link to={'/pengumpulan'} className=" btn btn-light rounded-5">
+                    <Link to={'/pengumpulan'} className=" btn btn-outline-primary rounded-5">
                         <span>Pengumpulan</span>
                         <i className="bi bi-chevron-right mx-2"></i>
                     </Link>
-                    <Link to={'/pengambilan'} className=" btn btn-light rounded-5">
+                    <Link to={'/peminjaman'} className=" btn btn-outline-primary rounded-5">
+                        <span>Peminjaman</span>
+                        <i className="bi bi-chevron-right mx-2"></i>
+                    </Link>
+                    <Link to={'/pengambilan'} className=" btn btn-outline-primary rounded-5">
                         <span>Pengambilan</span>
                         <i className="bi bi-chevron-right mx-2"></i>
                     </Link>
-                    <Link to={'/kelas'} className=" btn btn-light rounded-5">
+                    <Link to={'/kelas'} className=" btn btn-outline-primary rounded-5">
                         <span>Lihat Kelas</span>
                         <i className="bi bi-chevron-right mx-2"></i>
                     </Link>

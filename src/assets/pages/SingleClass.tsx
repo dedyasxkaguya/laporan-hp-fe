@@ -30,6 +30,7 @@ export interface Report {
     type: string
     officer: string
     image: string
+    notes: string
     created_at: Date
     updated_at: Date
     formatted_date: Date
@@ -51,6 +52,9 @@ const SingleClass = () => {
     const { uuid } = useParams()
     const [data, setData] = useState<Data>()
     // const [dateNow, setDate] = useState<string>()
+    const [totalPengumpulan, setPengumpulan] = useState<number>(0)
+    const [totalPengambilan, setPengambilan] = useState<number>(0)
+    const [totalPeminjaman, setPeminjaman] = useState<number>(0)
     useEffect(() => {
         if (uuid) {
             axios.get<Data>(`http://127.0.0.1:8000/api/class/searchByUUID/${uuid}`)
@@ -59,13 +63,19 @@ const SingleClass = () => {
                     if (fetched.status) {
                         console.log(fetched)
                         setData(fetched)
-                        // const dateArr: string[] = new Date().toLocaleDateString('id-ID', {
-                        //     year: "numeric",
-                        //     month: "2-digit",
-                        //     day: "2-digit"
-                        // }).split("/")
-                        // const dateTemplate: string = `${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`
-                        // setDate(dateTemplate)
+                        const totalObj = { pengumpulan: 0, pengambilan: 0, peminjaman: 0 }
+                        fetched.reports.map((a) => {
+                            if (a.type.toLowerCase() == "pengumpulan") {
+                                totalObj.pengumpulan += 1
+                            } else if (a.type.toLowerCase() == "pengambilan") {
+                                totalObj.pengambilan += 1
+                            } else if (a.type.toLowerCase() == "peminjaman") {
+                                totalObj.peminjaman += 1
+                            }
+                            setPengumpulan(totalObj.pengumpulan)
+                            setPengambilan(totalObj.pengambilan)
+                            setPeminjaman(totalObj.peminjaman)
+                        })
                     } else {
                         console.log("Kosong")
                     }
@@ -96,9 +106,20 @@ const SingleClass = () => {
                         </div>
                     </div>
                     <hr />
-                    <div className=" d-flex justify-content-between align-items-center mb-4">
+                    <div className=" d-flex justify-content-between align-items-center">
                         <p className="m-0 fw-semibold">Daftar laporan kelas {data?.full_name}</p>
                         <Datacount len={data?.reports.length} />
+                    </div>
+                    <div className=" d-flex gap-2 py-2 mb-4">
+                        <div className="p-2 rounded-5 shadow-sm text-center bg-primary-subtle text-primary fw-light">
+                            Total Pengumpulan {totalPengumpulan}
+                        </div>
+                        <div className="p-2 rounded-5 shadow-sm text-center bg-success-subtle text-success fw-light">
+                            Total Pengambilan {totalPengambilan}
+                        </div>
+                        <div className="p-2 rounded-5 shadow-sm text-center bg-warning text-black fw-light">
+                            Total Peminjaman {totalPeminjaman}
+                        </div>
                     </div>
                     <table className=" table table-borderless">
                         <thead>
@@ -123,7 +144,7 @@ const SingleClass = () => {
                                         <span className=" text-secondary"> / 36 ({((a.phone / 36) * 100).toPrecision(3)}%)</span>
                                     </td>
                                     <td className=" p-2 px-4 align-middle">
-                                        <Status type={a.type} />
+                                        <Status type={a.type} note={a.notes} teacher={a.teacher_id.toString()} />
                                     </td>
                                     <td className=" p-2 px-4 align-middle">
                                         <PhotoBtn src={a.image} />

@@ -27,6 +27,7 @@ export interface LatestReport {
     type: string
     officer: string
     image: string
+    notes: string
     created_at: Date
     updated_at: Date
     formatted_date: Date
@@ -80,7 +81,12 @@ const Class = () => {
         }
     }
     const handleKelas = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setKelas([e.target.value])
+        const value = e.target.value
+        if (value == "all") {
+            setKelas(["X", "XI", "XII"])
+        } else {
+            setKelas([value])
+        }
     }
     const handleJurusan = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setJurusan(e.target.value)
@@ -121,6 +127,7 @@ const Class = () => {
                                 <select name="filterJurusan" id="filterJurusan" className=" form-select" onChange={(e) => handleJurusan(e)}
                                     ref={jurusanRef}>
                                     <option value="" selected hidden>Pilih Jurusan</option>
+                                    <option value="">Semua Jurusan</option>
                                     <option value="Bangunan">Bangunan</option>
                                     <option value="Listrik">Listrik</option>
                                     <option value="Mesin">Mesin</option>
@@ -132,6 +139,7 @@ const Class = () => {
                                 <label htmlFor="filterKelas" className=" form-label">Kelas</label>
                                 <select name="filterKelas" id="filterKelas" className=" form-select" ref={kelasRef} onChange={(e) => handleKelas(e)}>
                                     <option value="" selected hidden>Pilih Kelas</option>
+                                    <option value="all">Semua Kelas</option>
                                     <option value="X">X (Satu)</option>
                                     <option value="XI">XI (Dua)</option>
                                     <option value="XII">XII (Tiga)</option>
@@ -141,8 +149,10 @@ const Class = () => {
                                 <label htmlFor="filterStatus" className=" form-label">Status</label>
                                 <select name="filterStatus" id="filterStatus" className=" form-select" ref={statusRef} onChange={(e) => handleStatus(e)}>
                                     <option value="" selected hidden>Pilih Status</option>
+                                    <option value="">Semua Status</option>
                                     <option value="Pengumpulan">Pengumpulan</option>
                                     <option value="Pengambilan">Pengambilan</option>
+                                    <option value="Peminjaman">Peminjaman</option>
                                 </select>
                             </div>
                             <div className="">
@@ -187,8 +197,9 @@ const Class = () => {
                                                 <td className=" p-2 px-4 align-middle fw-semibold">{a.teacher.name}</td>
                                                 <td className=" p-2 px-4 align-middle ">
                                                     {
-                                                        a.latest_report ?
-                                                            <Status type={a.latest_report.type} /> : <Status type={"null"} />
+                                                        a.latest_report
+                                                            ? <Status note={a.latest_report.notes} type={a.latest_report.type} teacher={a.teacher.name} />
+                                                            : <Status note={null} type={"null"} teacher={a.teacher.name} />
                                                     }
                                                 </td>
                                                 <td className=" p-2 px-4 align-middle text-capitalize fw-semibold">

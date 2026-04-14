@@ -5,6 +5,7 @@ import Classlink from "../components/Classlink"
 import Datacount from "../components/Datacount"
 import PhotoBtn from "../components/PhotoBtn"
 import Daterow from "../components/Daterow"
+import Status from "../components/Status"
 export interface Data {
     id: number
     student_class_id: number
@@ -13,6 +14,7 @@ export interface Data {
     type: string
     officer: string
     image: string
+    notes: string
     created_at: Date
     updated_at: Date
     formatted_date: Date
@@ -41,12 +43,20 @@ export interface Teacher {
 interface ReportProps {
     type: string
 }
+export interface DataUser {
+    id: number;
+    username: string;
+    created_at: Date;
+    updated_at: Date;
+}
 const Laporan = ({ type }: ReportProps) => {
     const [data, setData] = useState<Data[]>()
     const [isLoad, setLoad] = useState<boolean>(true)
     const [query, setQuery] = useState<string>("")
-    const [isEmpty,setEmpty] = useState<boolean>(true)
+    const [isEmpty, setEmpty] = useState<boolean>(true)
+    const [user, setUser] = useState<DataUser>()
     // const [dateNow, setDate] = useState<string>()
+    const token: string = localStorage.getItem("token")!
     const apiLink = `http://127.0.0.1:8000/api/report/type/${type}`
     useEffect(() => {
         axios.get<Data[]>(apiLink)
@@ -55,23 +65,40 @@ const Laporan = ({ type }: ReportProps) => {
                 setTimeout(() => {
                     setLoad(false)
                     setData(fetched)
-                    if(fetched.length < 1){
+                    if (fetched.length < 1) {
                         setEmpty(true)
-                    }else{
+                    } else {
                         setEmpty(false)
                     }
                 }, 1000)
-                // const dateArr: string[] = new Date().toLocaleDateString('id-ID', {
-                //     year: "numeric",
-                //     month: "2-digit",
-                //     day: "2-digit"
-                // }).split("/")
-                // const dateTemplate: string = `${dateArr[2]}-${dateArr[1]}-${dateArr[0]}`
-                // setDate(dateTemplate)
             })
-    }, [apiLink])
+        if (localStorage.getItem("token")) {
+            if (token) {
+                axios.post<DataUser>("http://127.0.0.1:8000/api/getaccount", {}, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                    .then(data => {
+                        const fetched = data.data
+                        setUser(fetched)
+                    })
+            }
+        }
+    }, [apiLink, token])
     const handleQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
         setQuery(e.target.value)
+    }
+    const handleDelete = (id: number) => {
+        axios.delete(`http://127.0.0.1:8000/api/report/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+            .then(data => {
+                const fetched = data.data
+                console.log(fetched)
+            })
     }
     return (
         <>
@@ -90,6 +117,9 @@ const Laporan = ({ type }: ReportProps) => {
                 <section className=" p-2">
                     <input type="text" placeholder="Cari data" className=" form-control" onChange={(e) => handleQuery(e)} />
                     <br />
+                    {isLoad && (
+                        <p>Wait a minute...</p>
+                    )}
                     <table className=" table table-borderless">
                         <thead>
                             <tr className=" table-primary border-bottom">
@@ -99,12 +129,15 @@ const Laporan = ({ type }: ReportProps) => {
                                 <td className=" text-center">Nama Guru</td>
                                 <td className=" text-center">Jumlah Handphone</td>
                                 <td className=" text-center">Tanggal</td>
+                                {type == "peminjaman" && (
+                                    <td className=" text-center">Detail</td>
+                                )}
                                 <td className=" text-center">Foto</td>
+                                {user && (
+                                    <td className=" text-center">Delete</td>
+                                )}
                             </tr>
                         </thead>
-                        {isLoad && (
-                            <p>Wait a minute...</p>
-                        )}
                         <tbody>
                             {data?.map((a) => {
                                 if (a.student_class.name.toLowerCase().includes(query.toLowerCase())
@@ -125,19 +158,31 @@ const Laporan = ({ type }: ReportProps) => {
                                             <td className=" text-secondary p-2 px-4 align-middle">
                                                 <Daterow date={a.date.toString()} />
                                             </td>
+                                            {type == "peminjaman" && (
+                                                <td className=" p-2 px-4 align-middle">
+                                                    <Status type={a.type} note={a.notes} teacher={a.teacher.name} />
+                                                </td>
+                                            )}
                                             <td className=" p-2 px-4 align-middle">
                                                 <PhotoBtn src={a.image} />
                                             </td>
+                                            {user && (
+                                                <td className=" p-2 px-4 align-middle">
+                                                    <button type="button" className=" btn btn-danger" onClick={() => handleDelete(a.id)}>
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     )
                                 }
                             })}
                         </tbody>
                     </table>
-                    {isEmpty && (
-                        <p>Tidak ada laporan</p>
-                    )}
                 </section>
+                {isEmpty && (
+                    <p className=" m-0 mx-2">Tidak ada laporan</p>
+                )}
             </main>
         </>
     )

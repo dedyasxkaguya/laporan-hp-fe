@@ -18,6 +18,7 @@ const App = () => {
         <Route path="/" element={<Home />} /> 
         <Route path="/pengumpulan" element={<Laporan type="pengumpulan" />} />
         <Route path="/pengambilan" element={<Laporan type="pengambilan" />} />
+        <Route path="/peminjaman" element={<Laporan type="peminjaman" />} />
         <Route path="/kelas" element={<Class />} />
         <Route path="/kelas/:uuid" element={<SingleClass />} />
 
