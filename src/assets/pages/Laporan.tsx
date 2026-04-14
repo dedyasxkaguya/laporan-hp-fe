@@ -6,6 +6,7 @@ import Datacount from "../components/Datacount"
 import PhotoBtn from "../components/PhotoBtn"
 import Daterow from "../components/Daterow"
 import Status from "../components/Status"
+// import Modalbox from "../components/Modalbox"
 export interface Data {
     id: number
     student_class_id: number
@@ -164,7 +165,7 @@ const Laporan = ({ type }: ReportProps) => {
                                                 </td>
                                             )}
                                             <td className=" p-2 px-4 align-middle">
-                                                <PhotoBtn src={a.image} />
+                                                <PhotoBtn data={a} />
                                             </td>
                                             {user && (
                                                 <td className=" p-2 px-4 align-middle">
@@ -184,6 +185,42 @@ const Laporan = ({ type }: ReportProps) => {
                     <p className=" m-0 mx-2">Tidak ada laporan</p>
                 )}
             </main>
+            {/* {data && (
+                <Modalbox>
+                    <div className=" bg-white p-2">
+                        <section className=" d-flex justify-content-between align-items-center ">
+                            <div className=" p-2 bg-secondary-subtle text-black rounded-2 shadow-sm"
+                                style={{ width: "fit-content" }}>
+                                <p className=" m-0"><i className="bi bi-info-circle me-2"></i> Foto Petugas</p>
+                            </div>
+                            <button type="button" className=" btn btn-close"></button>
+                        </section>
+                        <hr />
+                        <img src={`http://127.0.0.1:8000/${data[0].image}`} alt="" className=" rounded-2 shadow" />
+                        <section className=" d-flex gap-2">
+                            <div className=" d-flex gap-2 p-2 bg-primary-subtle text-primary rounded-4 my-2"
+                                style={{ width: "fit-content" }}>
+                                <i className="bi bi-file-earmark-text-fill"></i>
+                                <p className=" fw-light m-0">
+                                    Laporan
+                                    <span className=" fw-semibold mx-2">
+                                        {data[0].officer}</span>
+                                </p>
+                            </div>
+                            <div className=" d-flex gap-2 p-2 bg-warning text-black rounded-4 my-2"
+                                style={{ width: "fit-content" }}>
+                                <i className="bi bi-file-earmark-text-fill"></i>
+                                <p className=" fw-light m-0">
+                                    Tipe
+                                    <span className=" fw-semibold mx-2">
+                                        {data[0].type}</span>
+                                </p>
+                            </div>
+                        </section>
+                        <p className=" text-secondary m-0">Tanggal {data[0].date.toString()}</p>
+                    </div>
+                </Modalbox>
+            )} */}
         </>
     )
 }

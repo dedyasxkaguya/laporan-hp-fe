@@ -245,7 +245,9 @@ const FormPengumpulan = () => {
         <>
             <Navbar />
             <section className=" mt-4 d-flex flex-column gap-2 p-3">
-                <p className="text-secondary fw-semibold my-2"><i className="bi bi-pencil-square me-2"></i><span>Form pengumpulan Gawai</span></p>
+                <p className="text-secondary fw-semibold my-2">
+                    <i className="bi bi-pencil-square me-2"></i><span>Form Pengumpulan Gawai</span>
+                </p>
                 <Today />
                 <div className=" mb-2">
                     <label htmlFor="nama" className=" form-label fw-semibold text-primary">
