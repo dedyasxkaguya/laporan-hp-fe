@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from "react"
 import Today from "./Today"
 import axios from "axios"
 import Swal from "sweetalert2"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import Navbar from "./Navbar"
+import teachers from '../../../public/Data/Teachers.json'
 export interface Data {
     id: number
     name: string
@@ -27,15 +28,16 @@ const FormPengumpulan = () => {
     const phoneRef = useRef<HTMLInputElement>(null)
     const namaGuruRef = useRef<HTMLInputElement>(null)
     const notesRef = useRef<HTMLInputElement>(null)
+    const inputGuruRef = useRef<HTMLInputElement>(null)
     const namaGuruRef1 = useRef<HTMLSelectElement>(null)
     const namaGuruRef2 = useRef<HTMLSelectElement>(null)
     const namaGuruRef3 = useRef<HTMLSelectElement>(null)
     const kelasRef = useRef<HTMLSelectElement>(null)
     const laporanRef = useRef<HTMLSelectElement>(null)
-    const navigate = useNavigate()
+    // const navigate = useNavigate()
 
     const namGuruArr = [namaGuruRef, namaGuruRef1, namaGuruRef2, namaGuruRef3]
-    const [dataTeacher, detDataTeacher] = useState<dataTeacher[]>()
+    // const [dataTeacher, detDataTeacher] = useState<dataTeacher[]>()
     const [photoBlob, setPhotoBlob] = useState<Blob>()
     const [photoUrl, setPhoto] = useState<string | boolean>(false)
     const [isLaporan, setLaporan] = useState<boolean | number>(false)
@@ -107,11 +109,11 @@ const FormPengumpulan = () => {
         }, 512)
     }
     useEffect(() => {
-        axios.get<dataTeacher[]>("http://127.0.0.1:8000/api/teacher")
-            .then(data => {
-                const fetched = data.data
-                detDataTeacher(fetched)
-            })
+        // axios.get<dataTeacher[]>("http://127.0.0.1:8000/api/teacher")
+        //     .then(data => {
+        //         const fetched = data.data
+        //         detDataTeacher(fetched)
+        //     })
         axios.get<Data[]>("http://127.0.0.1:8000/api/class")
             .then(data => {
                 const fetched = data.data
@@ -180,22 +182,22 @@ const FormPengumpulan = () => {
             text: "Fetching our API",
             showConfirmButton: false,
         })
-        if (namaRef.current && kelasRef.current && laporanRef.current && phoneRef.current) {
+        if (namaRef.current && kelasRef.current && laporanRef.current && phoneRef.current && inputGuruRef.current) {
             const namaValue = namaRef.current.value
             const kelasValue = kelasRef.current.value
             const laporanValue: number = Number(laporanRef.current.value)
             const phoneValue = phoneRef.current.value
             const notesValue = notesRef.current?.value ? notesRef.current.value : null
+            const namaGuruValue = inputGuruRef.current.value
             if (progress == 100) {
-                if (namaValue && kelasValue && laporanValue && photoUrl) {
-                    if (namGuruArr[laporanValue].current) {
-                        const namaGuru = namGuruArr[laporanValue].current.value
+                if (namaValue && kelasValue && laporanValue && photoUrl && namaGuruValue) {
+                    if (inputGuruRef) {
                         const formData = new FormData
                         formData.append("officer", namaValue)
                         formData.append("class_id", kelasValue)
                         formData.append("image", photoBlob as Blob)
                         formData.append("type", laporanValue == 1 ? "Pengumpulan" : laporanValue == 2 ? "Pengambilan" : "Peminjaman")
-                        formData.append("teacher", namaGuru)
+                        formData.append("teacher", namaGuruValue)
                         formData.append("phone", phoneValue)
                         formData.append("notes", notesValue as string)
                         try {
@@ -213,7 +215,7 @@ const FormPengumpulan = () => {
                                             showConfirmButton: false
                                         })
                                         setTimeout(() => {
-                                            navigate(0)
+                                            // navigate(0)
                                             setSend(false)
                                         }, 2000)
                                     }
@@ -223,6 +225,16 @@ const FormPengumpulan = () => {
                             setSend(false)
                         }
                     }
+                } else {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Mohon maaf",
+                        text: "Lengkapi form sebelum mengirim",
+                        toast: true,
+                        timer: 2000,
+                        timerProgressBar: true,
+                        showConfirmButton: false
+                    })
                 }
             } else {
                 Swal.fire({
@@ -275,7 +287,7 @@ const FormPengumpulan = () => {
                         <i className="bi bi-file-earmark-text-fill me-2"></i><span>Bentuk laporan</span>
                     </label>
                     <select name="laporan" id="laporan" className=" form-select" onChange={(e) => handleBentuk(e)} ref={laporanRef}>
-                        <option value="default" selected hidden>Pilih bentuk</option>
+                        <option value="default" selected hidden>Opsi    laporan</option>
                         <option value={1}>Pengumpulan</option>
                         <option value={2}>Pengambilan</option>
                         <option value={3}>Peminjaman</option>
@@ -291,7 +303,25 @@ const FormPengumpulan = () => {
                             onChange={(e) => handleNama(e)} ref={namaGuruRef} disabled />
                     </div>
                 )}
-                {isLaporan == 1 && (
+                {isLaporan && (
+                    <div className="mb-2">
+                        <label htmlFor="disabled" className=" form-label fw-semibold text-primary">
+                            <i className="bi bi-person-video3 me-2"></i>
+                            <span>
+                                Nama Guru {isLaporan == 1 ? "Pertama" : isLaporan == 2 ? "Terakhir" : "Penanggung Jawab"}
+                            </span>
+                        </label>
+                        <input type="text" name="" id="inputGuru" list='dataGuru' ref={inputGuruRef} className=" form-control" />
+                        <datalist id='dataGuru'>
+                            {teachers?.map((a) => {
+                                return (
+                                    <option value={a.name}>{a.name}</option>
+                                )
+                            })}
+                        </datalist>
+                    </div>
+                )}
+                {/* {isLaporan == 1 && (
                     <div className=" mb-2">
                         <label htmlFor="namaGuru1" className=" form-label fw-semibold text-primary">
                             <i className="bi bi-person-video3 me-2"></i>
@@ -341,6 +371,15 @@ const FormPengumpulan = () => {
                 )}
                 {isLaporan == 3 && (
                     <div className=" mb-2">
+                        <label htmlFor="namaGuru3" className=" form-label fw-semibold text-primary">
+                            <i className="bi bi-person-video3 me-2"></i>
+                            <span>Catatan Peminjaman</span>
+                        </label>
+                        <input type="text" name="" id="" className=" form-control" ref={notesRef} />
+                    </div>
+                )} */}
+                {isLaporan == 3 && (
+                    <div className="mb-2">
                         <label htmlFor="namaGuru3" className=" form-label fw-semibold text-primary">
                             <i className="bi bi-person-video3 me-2"></i>
                             <span>Catatan Peminjaman</span>
@@ -439,11 +478,11 @@ const FormPengumpulan = () => {
                         </video>
                     </div>
                     <div className=" d-flex justify-content-center align-items-center gap-4">
-                        <button type="button" className=" btn btn-primary" onClick={() => takePhoto()}>
+                        <button type="button" className=" btn btn-primary shadow" onClick={() => takePhoto()}>
                             <span>Ambil Foto</span>
                             <i className="bi bi-camera mx-2"></i>
                         </button>
-                        <button type="button" className=" btn btn-danger" onClick={() => closeModal()}>
+                        <button type="button" className=" btn btn-danger shadow" onClick={() => closeModal()}>
                             <span>Tutup</span>
                             <i className="bi bi-x-square-fill mx-2"></i>
                         </button>

@@ -33,7 +33,7 @@ const Status = ({ type, note, teacher }: statusProps) => {
                 style={{ cursor: "pointer" }} onClick={() => handlenote()}>
                 {type.toLowerCase() !== "peminjaman" ? type : "Detail"}
             </div>
-            {modal && (
+            {modal && type.toLowerCase() == "peminjaman" && (
                 <Modalbox>
                     <div className=" p-2 bg-white rounded-2">
                         <div className=" d-flex gap-4">

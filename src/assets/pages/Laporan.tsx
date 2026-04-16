@@ -6,6 +6,7 @@ import Datacount from "../components/Datacount"
 import PhotoBtn from "../components/PhotoBtn"
 import Daterow from "../components/Daterow"
 import Status from "../components/Status"
+import Swal from "sweetalert2"
 // import Modalbox from "../components/Modalbox"
 export interface Data {
     id: number
@@ -21,7 +22,7 @@ export interface Data {
     formatted_date: Date
     is_today: boolean
     student_class: StudentClass
-    teacher: Teacher
+    teacher: string
     phone: number
 }
 
@@ -30,14 +31,6 @@ export interface StudentClass {
     name: string
     vocation: string
     grade: string
-    created_at: Date
-    updated_at: Date
-}
-
-export interface Teacher {
-    id: number
-    name: string
-    email: string
     created_at: Date
     updated_at: Date
 }
@@ -51,7 +44,7 @@ export interface DataUser {
     updated_at: Date;
 }
 const Laporan = ({ type }: ReportProps) => {
-    const [data, setData] = useState<Data[]>()
+    const [data, setData] = useState<Data[]>([])
     const [isLoad, setLoad] = useState<boolean>(true)
     const [query, setQuery] = useState<string>("")
     const [isEmpty, setEmpty] = useState<boolean>(true)
@@ -62,6 +55,7 @@ const Laporan = ({ type }: ReportProps) => {
     useEffect(() => {
         axios.get<Data[]>(apiLink)
             .then(data => {
+                setData([])
                 const fetched = data.data
                 setTimeout(() => {
                     setLoad(false)
@@ -73,7 +67,7 @@ const Laporan = ({ type }: ReportProps) => {
                     }
                 }, 1000)
             })
-        if (localStorage.getItem("token")) {
+        if (localStorage.getItem("tokenAsli")) {
             if (token) {
                 axios.post<DataUser>("http://127.0.0.1:8000/api/getaccount", {}, {
                     headers: {
@@ -91,15 +85,35 @@ const Laporan = ({ type }: ReportProps) => {
         setQuery(e.target.value)
     }
     const handleDelete = (id: number) => {
-        axios.delete(`http://127.0.0.1:8000/api/report/${id}`, {
-            headers: {
-                Authorization: `Bearer ${token}`
+        Swal.fire({
+            icon: "warning",
+            title: "Are you sure",
+            text: "You couldn't revert this change",
+            showCancelButton: true,
+            confirmButtonText: "Yes, I'm Sure",
+            cancelButtonText: "No"
+        }).then(status => {
+            if (status.isConfirmed) {
+                axios.delete(`http://127.0.0.1:8000/api/report/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                })
+                    .then(data => {
+                        const fetched = data.data
+                        console.log(fetched)
+                        Swal.fire({
+                            icon: "success",
+                            title: "Berhasii",
+                            text: "Berhasil menghapus data dengan id " + fetched.data.id,
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        })
+
+                    })
             }
         })
-            .then(data => {
-                const fetched = data.data
-                console.log(fetched)
-            })
     }
     return (
         <>
@@ -143,7 +157,7 @@ const Laporan = ({ type }: ReportProps) => {
                             {data?.map((a) => {
                                 if (a.student_class.name.toLowerCase().includes(query.toLowerCase())
                                     || a.officer.toLowerCase().includes(query.toLowerCase())
-                                    || a.teacher.name.toLowerCase().includes(query.toLowerCase())) {
+                                    || a.teacher.toLowerCase().includes(query.toLowerCase())) {
                                     return (
                                         <tr>
                                             <td className=" p-2 px-4 align-middle fw-semibold">
@@ -152,7 +166,7 @@ const Laporan = ({ type }: ReportProps) => {
                                             <td className=" p-2 px-4 align-middle text-capitalize fw-semibold">
                                                 {a.officer.toLowerCase()}
                                             </td>
-                                            <td className=" p-2 px-4 align-middle">{a.teacher.name}</td>
+                                            <td className=" p-2 px-4 align-middle">{a.teacher}</td>
                                             <td className=" p-2 px-4 align-middle">{a.phone.toString().padStart(2, '0')}
                                                 <span className=" text-secondary"> / 36 ({((a.phone / 36) * 100).toPrecision(3)}%)</span>
                                             </td>
@@ -161,7 +175,7 @@ const Laporan = ({ type }: ReportProps) => {
                                             </td>
                                             {type == "peminjaman" && (
                                                 <td className=" p-2 px-4 align-middle">
-                                                    <Status type={a.type} note={a.notes} teacher={a.teacher.name} />
+                                                    <Status type={a.type} note={a.notes} teacher={a.teacher} />
                                                 </td>
                                             )}
                                             <td className=" p-2 px-4 align-middle">

@@ -81,7 +81,7 @@ const Login = () => {
                     </label>
                 </div>
                 <div className=" form-floating">
-                    <input type="text" name="password" id="password" placeholder="Masukkan Password" ref={passwordRef}
+                    <input type="password" name="password" id="password" placeholder="Masukkan Password" ref={passwordRef}
                         className=" form-control" />
                     <label htmlFor="password" className=" form-label">
                         Masukkan Password

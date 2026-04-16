@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import Modalbox from "./Modalbox";
 export interface Data {
     id: number;
     username: string;
@@ -13,7 +14,7 @@ const Navbar = () => {
     const [open, setOpen] = useState<boolean>()
     // const [load, isLoad] = useState<boolean>(true)
     useEffect(() => {
-        if (localStorage.getItem("token")) {
+        if (localStorage.getItem("tokenAsli")) {
             const token: string = localStorage.getItem("token")!
             if (token) {
                 axios.post<Data>("http://127.0.0.1:8000/api/getaccount", {}, {
@@ -63,6 +64,12 @@ const Navbar = () => {
                                 </Link>
                             </li>
                             <li>
+                                <Link to={'/peminjaman'} className="dropdown-item">
+                                    <i className="bi bi-box-arrow-in-up me-2"></i>
+                                    <span>Peminjaman</span>
+                                </Link>
+                            </li>
+                            <li>
                                 <Link to={'/kelas'} className="dropdown-item">
                                     <i className="bi bi-collection me-2"></i>
                                     <span>Kelas</span>
@@ -86,22 +93,25 @@ const Navbar = () => {
                 </div>
             </nav>
             {open && user && (
-                <section className=" p-4 border rounded-4 shadow modalCamera glassBox">
-                    <div className=" fw-light text-capitalize fs-4 p-2 rounded-2 bg-white">
-                        Halo, <span className=" fw-semibold">{user.username}</span>
-                    </div>
-                    <p>Selamat datang di halaman menu singkat</p>
-                    <div className="d-flex gap-2">
-                        <button type="button" className=" btn btn-outline-danger" onClick={() => handleLogout()}>
-                            <i className="bi bi-arrow-repeat me-2"></i>
-                            <span>Logout</span>
-                        </button>
-                        {/* <button type="button" className=" btn btn-outline-danger">
+                <Modalbox>
+                    <section className=" p-2 border rounded-3 shadow bg-white">
+                        <div className=" fw-light text-capitalize fs-4 rounded-2 d-flex justify-content-between align-items-center mb-2">
+                            <p className=" m-0">Halo, <span className=" fw-semibold">{user.username}</span></p>
+                            <button type="button" className=" btn btn-close" onClick={()=>handleOpen()}></button>
+                        </div>
+                        <p>Selamat datang di halaman menu singkat</p>
+                        <div className="d-flex gap-2">
+                            <button type="button" className=" btn btn-outline-danger" onClick={() => handleLogout()}>
+                                <i className="bi bi-arrow-repeat me-2"></i>
+                                <span>Logout</span>
+                            </button>
+                            {/* <button type="button" className=" btn btn-outline-danger">
                             <i className="bi bi-arrow-repeat me-2"></i>
                             <span>Login Ulang</span>
-                        </button> */}
-                    </div>
-                </section>
+                            </button> */}
+                        </div>
+                    </section>
+                </Modalbox>
             )}
         </>
     )

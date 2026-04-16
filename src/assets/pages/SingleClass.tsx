@@ -25,7 +25,7 @@ export interface Data {
 export interface Report {
     id: number
     student_class_id: number
-    teacher_id: number
+    teacher: string
     date: Date
     type: string
     officer: string
@@ -144,10 +144,10 @@ const SingleClass = () => {
                                         <span className=" text-secondary"> / 36 ({((a.phone / 36) * 100).toPrecision(3)}%)</span>
                                     </td>
                                     <td className=" p-2 px-4 align-middle">
-                                        <Status type={a.type} note={a.notes} teacher={a.teacher_id.toString()} />
+                                        <Status type={a.type} note={a.notes} teacher={a.teacher} />
                                     </td>
                                     <td className=" p-2 px-4 align-middle">
-                                        <PhotoBtn src={a.image} />
+                                        <PhotoBtn data={a} />
                                     </td>
                                 </tr>
                             )

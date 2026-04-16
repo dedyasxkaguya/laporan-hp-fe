@@ -8,8 +8,8 @@ import Class from "./assets/pages/Class"
 import SingleClass from "./assets/pages/SingleClass"
 import Laporan from "./assets/pages/Laporan"
 // import Laporan from "./assets/pages/test/Laporan"
-import FormPengumpulan from "./assets/components/test/FormPengumpulan"
 import Login from "./assets/pages/Login"
+import Inputguru from "./assets/pages/test/Inputguru"
 
 const App = () => {
   return (
@@ -24,7 +24,7 @@ const App = () => {
 
         <Route path="/login" element={<Login />} />
 
-        <Route path="/test" element={<FormPengumpulan />} />
+        <Route path="/test" element={<Inputguru />} />
       </Routes>
     </main>
   )
