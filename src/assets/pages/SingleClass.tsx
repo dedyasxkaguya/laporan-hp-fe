@@ -6,46 +6,48 @@ import Datacount from "../components/Datacount"
 import PhotoBtn from "../components/PhotoBtn"
 import Daterow from "../components/Daterow"
 import Status from "../components/Status"
+import { Chart } from "chart.js/auto"
 
 export interface Data {
-    id: number
-    teacher_id: number
-    name: string
-    full_name: string
-    vocation: string
-    uuid: string
-    grade: string
-    created_at: Date
-    updated_at: Date
-    status: boolean
-    reports: Report[]
-    teacher: Teacher
+    id: number;
+    teacher_id: number;
+    name: string;
+    full_name: string;
+    vocation: string;
+    uuid: string;
+    grade: string;
+    created_at: Date;
+    updated_at: Date;
+    status: boolean;
+    weekly_reports: Report[];
+    reports: Report[];
+    teacher: Teacher;
 }
 
 export interface Report {
-    id: number
-    student_class_id: number
-    teacher: string
-    date: Date
-    type: string
-    officer: string
-    image: string
-    notes: string
-    created_at: Date
-    updated_at: Date
-    formatted_date: Date
-    is_today: boolean
-    phone: number
+    id: number;
+    student_class_id: number;
+    date: Date;
+    phone: number;
+    type: string;
+    officer: string;
+    teacher: string;
+    image: string;
+    notes: null | string;
+    created_at: Date;
+    updated_at: Date;
+    formatted_date: Date;
+    is_today: boolean;
 }
 
 export interface Teacher {
-    id: number
-    class_name: string
-    name: string
-    uuid: string
-    classroom: string
-    created_at: Date
-    updated_at: Date
+    id: number;
+    class_name: string;
+    name: string;
+    uuid: string;
+    classroom: string;
+    created_at: Date;
+    updated_at: Date;
 }
 
 const SingleClass = () => {
@@ -55,14 +57,52 @@ const SingleClass = () => {
     const [totalPengumpulan, setPengumpulan] = useState<number>(0)
     const [totalPengambilan, setPengambilan] = useState<number>(0)
     const [totalPeminjaman, setPeminjaman] = useState<number>(0)
+    const [dataHp, setDataHp] = useState<number[]>([])
+    const [dataTanggal, setDataTanggal] = useState<string[]>([])
+    // const days: string[] = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
+    const ctx = document.getElementById("canvas0") as HTMLCanvasElement
+
+    const handleChart = () => {
+        if (ctx) {
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: dataTanggal,
+                    datasets: [
+                        {
+                            label: "Jumlah HP ",
+                            data: dataHp,
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            })
+        }
+    }
     useEffect(() => {
         if (uuid) {
             axios.get<Data>(`http://127.0.0.1:8000/api/class/searchByUUID/${uuid}`)
                 .then(data => {
                     const fetched = data.data
                     if (fetched.status) {
-                        console.log(fetched)
                         setData(fetched)
+                        const arrHp: number[] = []
+                        const arrDate:string[] = []
+                        fetched.weekly_reports.map((a) => {
+                            arrHp.push(a.phone)
+                            arrDate.push(new Date(a.date).toLocaleDateString('id-ID', {
+                                dateStyle:'long',
+                            }))
+                        })
+                        setDataHp(arrHp.reverse())
+                        setDataTanggal(arrDate.reverse())
                         const totalObj = { pengumpulan: 0, pengambilan: 0, peminjaman: 0 }
                         fetched.reports.map((a) => {
                             if (a.type.toLowerCase() == "pengumpulan") {
@@ -81,7 +121,8 @@ const SingleClass = () => {
                     }
                 })
         }
-    }, [uuid])
+        handleChart()
+    }, [uuid, ctx])
     return (
         <>
             <Navbar />
@@ -154,6 +195,10 @@ const SingleClass = () => {
                         })}
                         </tbody>
                     </table>
+                </section>
+                <section className=" p-4">
+                    <p>Diagram Kelas {data?.full_name}</p>
+                    <canvas id="canvas0"></canvas>
                 </section>
             </main >
         </>
