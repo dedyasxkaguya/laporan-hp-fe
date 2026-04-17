@@ -100,9 +100,9 @@ const SingleClass = () => {
                         const arrBGcolor: string[] = []
                         fetched.weekly_reports.map((a) => {
                             arrHp.push(a.phone)
-                            arrDate.push(new Date(a.date).toLocaleDateString('id-ID', {
+                            arrDate.push(`${a.type.toUpperCase()} ${new Date(a.date).toLocaleDateString('id-ID', {
                                 dateStyle: 'long',
-                            }))
+                            })}`)
                             arrBGcolor.push(a.type.toLowerCase() == "pengumpulan" ? "#d1e7dd" : a.type.toLowerCase() == "pengambilan" ? "#cfe2ff" : "#fff3cd")
                         })
                         setDataHp(arrHp.reverse())
