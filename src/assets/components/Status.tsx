@@ -31,7 +31,8 @@ const Status = ({ type, note, teacher }: statusProps) => {
                         ? "bg-primary-subtle text-primary"
                         : "bg-warning text-black"}`}
                 style={{ cursor: "pointer" }} onClick={() => handlenote()}>
-                {type.toLowerCase() !== "peminjaman" ? type : "Detail"}
+                {/* {type.toLowerCase() !== "peminjaman" ? type : "Detail"} */}
+                {type}
             </div>
             {modal && type.toLowerCase() == "peminjaman" && (
                 <Modalbox>

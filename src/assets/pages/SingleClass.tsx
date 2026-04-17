@@ -59,6 +59,7 @@ const SingleClass = () => {
     const [totalPeminjaman, setPeminjaman] = useState<number>(0)
     const [dataHp, setDataHp] = useState<number[]>([])
     const [dataTanggal, setDataTanggal] = useState<string[]>([])
+    const [dataWarna, setDataWarna] = useState<string[]>([])
     // const days: string[] = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"]
     const ctx = document.getElementById("canvas0") as HTMLCanvasElement
 
@@ -72,9 +73,10 @@ const SingleClass = () => {
                         {
                             label: "Jumlah HP ",
                             data: dataHp,
-                            borderWidth: 1
+                            borderWidth: 1,
+                            backgroundColor: dataWarna
                         }
-                    ]
+                    ],
                 },
                 options: {
                     scales: {
@@ -94,15 +96,18 @@ const SingleClass = () => {
                     if (fetched.status) {
                         setData(fetched)
                         const arrHp: number[] = []
-                        const arrDate:string[] = []
+                        const arrDate: string[] = []
+                        const arrBGcolor: string[] = []
                         fetched.weekly_reports.map((a) => {
                             arrHp.push(a.phone)
                             arrDate.push(new Date(a.date).toLocaleDateString('id-ID', {
-                                dateStyle:'long',
+                                dateStyle: 'long',
                             }))
+                            arrBGcolor.push(a.type.toLowerCase() == "pengumpulan" ? "#d1e7dd" : a.type.toLowerCase() == "pengambilan" ? "#cfe2ff" : "#fff3cd")
                         })
                         setDataHp(arrHp.reverse())
                         setDataTanggal(arrDate.reverse())
+                        setDataWarna(arrBGcolor.reverse())
                         const totalObj = { pengumpulan: 0, pengambilan: 0, peminjaman: 0 }
                         fetched.reports.map((a) => {
                             if (a.type.toLowerCase() == "pengumpulan") {
@@ -198,6 +203,13 @@ const SingleClass = () => {
                 </section>
                 <section className=" p-4">
                     <p>Diagram Kelas {data?.full_name}</p>
+                    <div className=" p-2 rounded-4 shadow-sm" style={{ width:"fit-content" }}>
+                        <p className=" fw-semibold m-0">Legenda</p>
+                        <hr />
+                        <p className=" m-0">Pengumpulan <i className="bi bi-info-circle text-success mx-2"></i></p>
+                        <p className=" m-0">Pengambilan <i className="bi bi-info-circle text-primary mx-2"></i></p>
+                        <p className=" m-0">Peminjaman <i className="bi bi-info-circle text-warning mx-2"></i></p>
+                    </div>
                     <canvas id="canvas0"></canvas>
                 </section>
             </main >
